@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Wordle</title>
+</head>
+
+<body>
+    <div id="toast-container">
+
+    </div>
+
+    <div id="board"></div>
+
+    <div class="keyboard">
+        <div class="key-row one">
+            <button type="button" data-value="q">Q</button>
+            <button type="button" data-value="w">W</button>
+            <button type="button" data-value="e">E</button>
+            <button type="button" data-value="r">R</button>
+            <button type="button" data-value="t">T</button>
+            <button type="button" data-value="y">Y</button>
+            <button type="button" data-value="u">U</button>
+            <button type="button" data-value="i">I</button>
+            <button type="button" data-value="o">O</button>
+            <button type="button" data-value="p">P</button>
+        </div>
+        <div class="key-row two">
+            <button type="button" data-value="a">A</button>
+            <button type="button" data-value="s">S</button>
+            <button type="button" data-value="d">D</button>
+            <button type="button" data-value="f">F</button>
+            <button type="button" data-value="g">G</button>
+            <button type="button" data-value="h">H</button>
+            <button type="button" data-value="j">J</button>
+            <button type="button" data-value="k">K</button>
+            <button type="button" data-value="l">L</button>
+        </div>
+        <div class="key-row three">
+            <button type="button" id="enter">
+                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 7.90653L4.26737 10.1739C4.35474 10.2613 4.4977 10.2569 4.5795 10.1643L12 1.76367"
+                        stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+            </button>
+            <button type="button" data-value="a">Z</button>
+            <button type="button" data-value="x">X</button>
+            <button type="button" data-value="c">C</button>
+            <button type="button" data-value="v">V</button>
+            <button type="button" data-value="b">B</button>
+            <button type="button" data-value="n">N</button>
+            <button type="button" data-value="m">M</button>
+            <button type="button" id="backspace">
+                <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M5.25161 0.5C4.93454 0.5 4.63626 0.650372 4.44769 0.905273L0.748806 5.90527C0.487377 6.25866 0.487377 6.74134 0.748806 7.09473L4.44769 12.0947C4.63626 12.3496 4.93454 12.5 5.25161 12.5H16.5867C17.1389 12.5 17.5867 12.0523 17.5867 11.5V1.5C17.5867 0.947715 17.1389 0.5 16.5867 0.5H5.25161ZM1.96737 6.5L5.41965 1.83333H16.2533V11.1667H5.41965L1.96737 6.5ZM7.24243 4.30479L9.40126 6.46335L7.24243 8.62192L8.18518 9.56479L10.3441 7.40611L12.5031 9.56479L13.4458 8.62192L11.287 6.46335L13.4458 4.30479L12.5031 3.36192L10.3441 5.5206L8.18518 3.36192L7.24243 4.30479Z"
+                        fill="white" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <script src="scripts.js" type="module"></script>
+</body>
+
+</html>

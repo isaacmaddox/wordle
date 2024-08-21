@@ -1,0 +1,367 @@
+:root {
+    color-scheme: light dark;
+
+    --page-background: light-dark(#f7f7f7, #111);
+
+    --button-background: light-dark(#eee, #1c1c1c);
+    --button-background-hover: light-dark(#e4e4e4, #232323);
+    --button-border: light-dark(#f9f9f9, #222222);
+    --button-color: light-dark(#000, #fff);
+
+    --button-checked-background: light-dark(#aaa, #191919);
+
+    --cell-border: light-dark(#ddd, #333);
+    --cell-full-border: light-dark(#999, #666);
+    --cell-checked-background: light-dark(#eee, #333);
+
+    --cell-in-word-background: light-dark(hsl(34, 75%, 70%), hsl(34, 75%, 30%));
+
+    --cell-correct-background: light-dark(hsl(120, 75%, 65%), hsl(120, 75%, 20%));
+
+    --toast-background: light-dark(#eee, #181818);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    font-family: 'Onest', system-ui, sans-serif;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background: var(--page-background);
+}
+
+body {
+    display: grid;
+    grid-template-rows: 1fr max-content;
+    justify-content: center;
+}
+
+.keyboard {
+    --_key-gap: .125rem;
+
+    /* position: fixed;
+    bottom: 0; */
+    padding: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--_key-gap);
+    align-items: center;
+    margin-inline: auto;
+    width: fit-content;
+
+    .key-row {
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+
+        gap: var(--_key-gap);
+
+        &.three {
+            display: flex;
+            gap: var(--_key-gap);
+        }
+
+        button {
+            border: none;
+            width: 38px;
+            height: 60px;
+            border-radius: .5em;
+            cursor: pointer;
+            background: var(--button-background);
+            font-weight: 500;
+            font-size: 1.12rem;
+            color: var(--button-color);
+            padding: 0;
+            display: grid;
+            place-items: center;
+
+            &:is(.checked, .in-word, .correct) {
+                transition: background 0ms 900ms linear;
+            }
+
+            &.checked {
+                background: var(--button-checked-background);
+                opacity: .75;
+            }
+
+            &.in-word {
+                background: var(--cell-in-word-background);
+            }
+
+            &.correct {
+                background: var(--cell-correct-background);
+            }
+
+            &#enter,
+            &#backspace {
+                flex-grow: 1;
+
+                & svg {
+                    [fill] {
+                        fill: currentColor
+                    }
+
+                    [stroke] {
+                        stroke: currentColor
+                    }
+                }
+            }
+
+            @media (pointer: fine) {
+                &:not(.checked, .in-word, .correct):hover {
+                    background: var(--button-background-hover);
+                }
+            }
+
+            @media (width <=420px) {
+                width: 32px;
+            }
+
+            @media (width <=360px) {
+                width: 30px;
+                height: 48px;
+            }
+        }
+    }
+}
+
+#board {
+    --_gap: .5rem;
+
+    padding-block: var(--_gap);
+    width: calc(100% - 2rem);
+    aspect-ratio: 5 / 6;
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    margin: auto;
+    gap: var(--_gap);
+
+    .row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 100%;
+        gap: var(--_gap);
+
+        .cell {
+            border: 2px solid var(--cell-border);
+            aspect-ratio: 1;
+            border-radius: .5rem;
+            font-size: 2rem;
+            display: grid;
+            place-items: center;
+            text-transform: uppercase;
+            line-height: 1;
+            font-weight: 600;
+            transition: border-color 200ms ease;
+            pointer-events: none;
+            user-select: none;
+
+            &:is(.in-word, .checked, .correct):nth-child(2) {
+                animation-delay: 100ms;
+            }
+
+            &:is(.in-word, .checked, .correct):nth-child(3) {
+                animation-delay: 200ms;
+            }
+
+            &:is(.in-word, .checked, .correct):nth-child(4) {
+                animation-delay: 300ms;
+            }
+
+            &:is(.in-word, .checked, .correct):nth-child(5) {
+                animation-delay: 400ms;
+            }
+
+            &:empty {
+                animation: removeValue 250ms ease;
+            }
+
+            &:not(:empty) {
+                animation: addValue 250ms ease;
+                border-color: var(--cell-full-border);
+            }
+
+            &.checked {
+                animation: showChecked 500ms ease forwards;
+            }
+
+            &.in-word {
+                animation: showInWord 500ms ease forwards;
+            }
+
+            &.correct {
+                animation: showCorrect 500ms ease forwards;
+            }
+        }
+
+        &.win .cell {
+            animation: bounce 350ms ease forwards;
+            background: var(--cell-correct-background);
+            border-color: var(--cell-correct-background);
+        }
+
+        &:has(+ .win),
+        .win~& {
+            transition: filter 200ms ease, opacity 200ms ease;
+            filter: saturate(50%);
+            opacity: .6;
+        }
+    }
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+
+    35% {
+        transform: translateY(-10px);
+    }
+
+    75% {
+        transform: translateY(2px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+#toast-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+
+    .toast {
+        --_top: -100px;
+
+        position: absolute;
+        width: fit-content;
+        width: -moz-fit-content;
+        inset-inline: 0;
+        margin-inline: auto;
+        background: var(--toast-background);
+        padding: 1rem 1.5rem;
+        border-radius: .5rem;
+        font-weight: 600;
+        top: var(--_top);
+        transition: top 200ms ease;
+    }
+}
+
+@keyframes addValue {
+    0% {
+        transform: scale(1)
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes removeValue {
+    0% {
+        transform: scale(1)
+    }
+
+    50% {
+        transform: scale(.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes showInWord {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    49.9% {
+        background: transparent;
+        border-color: var(--cell-full-border);
+        transform: rotateX(90deg);
+    }
+
+    50% {
+        background: var(--cell-in-word-background);
+        border-color: var(--cell-in-word-background);
+    }
+
+    55% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+        background: var(--cell-in-word-background);
+        border-color: var(--cell-in-word-background);
+    }
+}
+
+@keyframes showCorrect {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    49.9% {
+        background: transparent;
+        border-color: var(--cell-full-border);
+        transform: rotateX(90deg);
+    }
+
+    50% {
+        background: var(--cell-correct-background);
+        border-color: var(--cell-correct-background);
+    }
+
+    55% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+        background: var(--cell-correct-background);
+        border-color: var(--cell-correct-background);
+    }
+}
+
+@keyframes showChecked {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    49.9% {
+        background: transparent;
+        border-color: var(--cell-full-border);
+        transform: rotateX(90deg);
+    }
+
+    50% {
+        background: var(--cell-checked-background);
+        border-color: var(--cell-checked-background);
+    }
+
+    55% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+        background: var(--cell-checked-background);
+        border-color: var(--cell-checked-background);
+    }
+}
