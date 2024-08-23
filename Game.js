@@ -9,7 +9,7 @@ export default class Game {
 	#board;
 
 	newGame() {
-		this.#board = [].fill([null, null, null, null, null]);
+		this.#board = [];
 		this.#word = WORDS[Math.floor(Math.random() * WORDS.length)];
 		this.#currentIndex = 0;
 
@@ -18,6 +18,7 @@ export default class Game {
 		}
 
 		this.#listener?.onBoardCreated(this.#board);
+		console.log(this.#word);
 	}
 
 	key(key) {
@@ -39,64 +40,79 @@ export default class Game {
 		this.#listener?.onBoardUpdated(this.#board);
 	}
 
+	clearGuess() {
+		this.#currentGuess = "";
+		this.#board[this.#currentIndex] = new Array(WORD_LENGTH).fill(null);
+		this.#listener?.onBoardUpdated(this.#board);
+	}
+
 	checkValidWord() {
 		if (this.#currentGuess.length < WORD_LENGTH) {
-			return "Not long enough!";
+			return [false, "Not long enough!"];
 		}
 
 		if (!WORDS.includes(this.#currentGuess)) {
-			return "Not in words list!";
+			return [false, "Not in words list!"];
 		}
 
-		return false;
+		return [true, null];
 	}
 
 	guess() {
-		let tmpWord = this.#word.split('');
+		let tmpWord = [...this.#word];
 		let existingCells = [];
 		let correctCells = [];
-		let keys = tmpWord.map(key => {
+		let keys = [...this.#currentGuess].map((value) => {
 			return {
-				key: key,
-				className: 'checked'
-			}
+				key: value,
+				className: "checked",
+			};
 		});
 
 		for (let i = 0; i < this.#currentGuess.length; ++i) {
 			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
 
+			if (this.#word[i] === this.#currentGuess[i]) {
+				correctCells.push(i);
+				tmpWord[indexOfLetter] = "#";
+				continue;
+			}
+
 			if (indexOfLetter > -1) {
 				tmpWord[indexOfLetter] = "#";
 				existingCells.push(i);
 			}
-
-			if (this.#word[i] === this.#currentGuess[i]) {
-				correctCells.push(i);
-			}
-		}
-
-		for (let index of existingCells) {
-			keys.push({
-				key: this.#currentGuess[index],
-				className: "in-word"
-			})
 		}
 
 		for (let index of correctCells) {
 			if (!tmpWord.includes(this.#currentGuess[index])) {
 				keys.push({
 					key: this.#currentGuess[index],
-					className: "correct"
-				})
+					className: "correct",
+				});
+			} else {
+				keys.push({
+					key: this.#currentGuess[index],
+					className: "in-word",
+				});
 			}
+		}
+
+		for (let index of existingCells) {
+			keys.push({
+				key: this.#currentGuess[index],
+				className: "in-word",
+			});
 		}
 
 		this.#listener?.onGuessChecked(
 			this.#currentIndex,
-			existingCells.map(v => v + 1),
-			correctCells.map(v => v + 1),
+			existingCells.map((v) => v + 1),
+			correctCells.map((v) => v + 1),
 			keys
 		);
+
+		console.log(keys);
 
 		++this.#currentIndex;
 
@@ -104,7 +120,7 @@ export default class Game {
 			this.#listener?.onGameWin(this.#currentIndex);
 		}
 
-		if (this.#currentIndex === 6) {
+		if (this.#currentIndex === NUM_TRIES) {
 			this.#listener?.onGameOver(this.#word);
 		}
 

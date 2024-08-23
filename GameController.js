@@ -1,5 +1,4 @@
 import Game from "./Game.js";
-import { NUM_TRIES } from "./scripts.js";
 import ToastManager from "./ToastManager.js";
 
 export default class GameController {
@@ -12,20 +11,20 @@ export default class GameController {
 	constructor() {
 		this.#boardElement = document.getElementById("board");
 
-		for (let i = 0; i < NUM_TRIES; ++i) {
-			let row = document.createE;
-		}
-
 		this.#game.addBoardListener(this);
 		this.#game.newGame();
 	}
 
 	key(key) {
-		if (!this.#isChecking && !this.#isGameOver) this.#game.key(key);
+		if (!this.#isGameOver) this.#game.key(key);
 	}
 
 	delete() {
-		if (!this.#isChecking && !this.#isGameOver) this.#game.delete();
+		if (!this.#isGameOver) this.#game.delete();
+	}
+
+	clearGuess() {
+		if (!this.#isGameOver) this.#game.clearGuess();
 	}
 
 	guess() {
@@ -34,22 +33,22 @@ export default class GameController {
 			return false;
 		}
 
-		if (this.#game.checkValidWord()) {
-			this.#toastManager.toast(this.#game.checkValidWord());
+		let [isValid, message] = this.#game.checkValidWord();
+
+		if (!isValid) {
+			this.#toastManager.toast(message);
 			return false;
 		}
 
-		this.#isChecking = true;
 		this.#game.guess();
-		setTimeout(() => {
-			this.#isChecking = false;
-		}, 900);
 
 		return true;
 	}
 
 	onBoardCreated(board) {
-		this.#boardElement.querySelectorAll("*")?.forEach((child) => child.remove());
+		this.#boardElement
+			.querySelectorAll("*")
+			?.forEach((child) => child.remove());
 
 		for (let i = 0; i < board.length; ++i) {
 			const row = document.createElement("div");
@@ -68,16 +67,17 @@ export default class GameController {
 		document
 			.querySelectorAll(".keyboard button")
 			.forEach((btn) => (btn.classList = ""));
+
+		this.#isGameOver = false;
 	}
 
 	onBoardUpdated(board) {
 		for (let i = 0; i < board.length; ++i) {
+			let cells = document.querySelectorAll(`#board :nth-child(${i + 1}) *`);
+
 			for (let j = 0; j < board[i].length; ++j) {
-				let cell = document.querySelector(
-					`#board :nth-child(${i + 1}) :nth-child(${j + 1})`
-				);
-				if (cell.textContent != board[i][j]) {
-					cell.textContent = board[i][j];
+				if (cells[j].textContent != board[i][j]) {
+					cells[j].textContent = board[i][j];
 				}
 			}
 		}
@@ -97,7 +97,7 @@ export default class GameController {
 				`#board :nth-child(${row + 1}) :nth-child(${inWordCells[i]})`
 			);
 
-			cell.classList.add("in-word");
+			cell.classList.add("checked", "in-word");
 		}
 
 		for (let i = 0; i < correctCells.length; ++i) {
@@ -105,7 +105,7 @@ export default class GameController {
 				`#board :nth-child(${row + 1}) :nth-child(${correctCells[i]})`
 			);
 
-			cell.classList.add("correct");
+			cell.classList.add("checked", "correct");
 		}
 
 		for (let i = 0; i < keys.length; ++i) {
@@ -126,20 +126,72 @@ export default class GameController {
 				.classList.add("win");
 		}, 900);
 
-		setTimeout(() => {
-			let ans = confirm("You won! Do you want to play again?");
-
-			if (ans) {
-				this.#game.newGame();
-			}
-		}, 1900);
+		this.confirm(
+			"Congratulations!",
+			`You solved the puzzle in ${attempts} attempts. Play again?`,
+			() => this.#game.newGame(),
+			true,
+			1900
+		);
 	}
 
 	onGameOver(word) {
 		this.#isGameOver = true;
 
-		let ans = confirm(`Game over! The word was ${word}. Do you want to play again?`);
+		this.confirm(
+			"Game Over!",
+			`The word was "${word}." Do you want to play again?`,
+			() => this.#game.newGame(),
+			true,
+			900
+		);
+	}
 
-		if (ans) this.#game.newGame();
+	confirm(title, message, accept, reject, delay = 0) {
+		let dialogElement = document.createElement("dialog");
+		let headerElement = document.createElement("header");
+		let closeButton = document.createElement("button");
+		let titleElement = document.createElement("h2");
+		let messageElement = document.createElement("p");
+		let optionsElement = document.createElement("form");
+		let yesButton = document.createElement("button");
+		let noButton = document.createElement("button");
+
+		titleElement.textContent = title;
+
+		closeButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path fill-rule="evenodd" clip-rule="evenodd" d="M6.16634 16.773C5.87345 17.0659 5.87345 17.5408 6.16634 17.8336C6.45923 18.1265 6.93411 18.1265 7.227 17.8336L12 13.0607L16.7729 17.8337C17.0658 18.1265 17.5407 18.1265 17.8336 17.8337C18.1265 17.5408 18.1265 17.0659 17.8336 16.773L13.0606 12L17.8336 7.22705C18.1265 6.93415 18.1265 6.45928 17.8336 6.16639C17.5407 5.87349 17.0658 5.87349 16.7729 6.16639L12 10.9394L7.22699 6.16639C6.93409 5.8735 6.45922 5.8735 6.16633 6.16639C5.87343 6.45928 5.87343 6.93416 6.16633 7.22705L10.9393 12L6.16634 16.773Z" fill="#fff"/>
+			</svg>`;
+
+		closeButton.onclick = () => {
+			dialogElement.close();
+		};
+
+		messageElement.textContent = message;
+
+		optionsElement.method = "dialog";
+
+		yesButton.textContent = reject ? "Yes" : "Okay";
+		yesButton.type = "submit";
+		yesButton.onclick = accept;
+
+		noButton.textContent = reject ? "No" : "Close";
+		noButton.type = "submit";
+
+		headerElement.append(titleElement, closeButton);
+
+		optionsElement.append(yesButton, noButton);
+
+		dialogElement.append(headerElement, messageElement, optionsElement);
+
+		document.body.prepend(dialogElement);
+
+		setTimeout(() => {
+			dialogElement.showModal();
+			dialogElement.onclose = () => {
+				setTimeout(() => dialogElement.remove(), 200);
+			};
+			yesButton.focus();
+		}, delay);
 	}
 }

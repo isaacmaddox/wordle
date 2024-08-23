@@ -6,13 +6,19 @@ export const WORD_LENGTH = 5;
 const driver = new GameController();
 
 document.addEventListener("keydown", (e) => {
-	if (e.key.length == 1 && e.code.startsWith("Key")) {
+	if (e.shiftKey || e.altKey) return;
+
+	if (e.code.startsWith("Key")) {
 		return driver.key(e.key);
 	}
 
 	switch (e.key) {
 		case "Backspace":
-			driver.delete();
+			if (!e.ctrlKey) {
+				driver.delete();
+			} else {
+				driver.clearGuess();
+			}
 			break;
 		case "Enter":
 			driver.guess();

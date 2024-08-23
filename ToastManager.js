@@ -1,6 +1,7 @@
 export default class ToastManager {
 	#toasts = [];
 	#container;
+	#TOAST_DURATION = 2000;
 
 	constructor() {
 		this.#container = document.getElementById("toast-container");
@@ -9,14 +10,13 @@ export default class ToastManager {
 	toast(message) {
 		let newToast = new Toast(message);
 		this.#toasts = [newToast, ...this.#toasts];
-		this.#container.appendChild(newToast.getElement());
+		this.#container?.appendChild(newToast.getElement());
 		this.updateToastTops();
 
 		setTimeout(() => {
-			newToast.remove().then(() => {
-				this.#toasts.splice(this.#toasts.indexOf(newToast), 1);
-			});
-		}, 2000);
+			newToast.remove();
+			this.#toasts.splice(this.#toasts.indexOf(newToast), 1);
+		}, this.#TOAST_DURATION);
 	}
 
 	updateToastTops() {
@@ -32,6 +32,7 @@ export default class ToastManager {
 
 class Toast {
 	#element;
+	#height;
 
 	constructor(message) {
 		this.#element = document.createElement("div");
@@ -50,22 +51,18 @@ class Toast {
 	}
 
 	getHeight() {
-		return this.#element.getBoundingClientRect().height;
+		if (!this.#height) {
+			this.#height = this.#element.getBoundingClientRect().height;
+		}
+
+		return this.#height;
 	}
 
 	remove() {
-		this.#element.classList.add('hide');
+		this.#element.classList.add("hide");
 
 		setTimeout(() => {
 			this.#element.remove();
 		}, 200);
-
-		return {
-			then(callback) {
-				setTimeout(() => {
-					callback()
-				}, 1000)
-			}
-		}
 	}
 }
