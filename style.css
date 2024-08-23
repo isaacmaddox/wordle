@@ -8,7 +8,7 @@
     --button-border: light-dark(#f9f9f9, #222222);
     --button-color: light-dark(#000, #fff);
 
-    --button-checked-background: light-dark(#aaa, #191919);
+    --button-checked-background: light-dark(#ccc, #191919);
 
     --cell-border: light-dark(#ddd, #333);
     --cell-full-border: light-dark(#999, #666);
@@ -18,7 +18,8 @@
 
     --cell-correct-background: light-dark(hsl(120, 75%, 65%), hsl(120, 75%, 20%));
 
-    --toast-background: light-dark(#eee, #181818);
+    --toast-background: light-dark(#fff, #181818);
+    --toast-shadow-color: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, .3));
 }
 
 *,
@@ -43,10 +44,8 @@ body {
 }
 
 .keyboard {
-    --_key-gap: .125rem;
+    --_key-gap: .25rem;
 
-    /* position: fixed;
-    bottom: 0; */
     padding: .5rem;
     display: flex;
     flex-direction: column;
@@ -86,9 +85,9 @@ body {
                 transition: background 0ms 900ms linear;
             }
 
-            &.checked {
+            &.checked:not(.in-word, .correct) {
                 background: var(--button-checked-background);
-                opacity: .75;
+                opacity: .5;
             }
 
             &.in-word {
@@ -137,6 +136,7 @@ body {
 
     padding-block: var(--_gap);
     width: calc(100% - 2rem);
+    max-height: 100%;
     aspect-ratio: 5 / 6;
     display: grid;
     grid-template-rows: repeat(6, 1fr);
@@ -207,7 +207,7 @@ body {
             border-color: var(--cell-correct-background);
         }
 
-        &:has(+ .win),
+        &:has(~ .win),
         .win~& {
             transition: filter 200ms ease, opacity 200ms ease;
             filter: saturate(50%);
@@ -246,14 +246,27 @@ body {
         position: absolute;
         width: fit-content;
         width: -moz-fit-content;
-        inset-inline: 0;
+        right: 16px;
         margin-inline: auto;
         background: var(--toast-background);
         padding: 1rem 1.5rem;
         border-radius: .5rem;
         font-weight: 600;
         top: var(--_top);
-        transition: top 200ms ease;
+        transition: top 200ms ease, opacity 200ms ease, transform 200ms ease;
+        transform-origin: center right;
+        box-shadow: 0px 2px 15px var(--toast-shadow-color);
+
+        &.hide {
+            opacity: 0;
+            transform: scale(.6);
+        }
+
+        @media (width < 700px) {
+            right: unset;
+            inset-inline: 0;
+            transform-origin: center;
+        }
     }
 }
 

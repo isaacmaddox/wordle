@@ -2,50 +2,49 @@ import { NUM_TRIES, WORD_LENGTH } from "./scripts.js";
 import { WORDS } from "./words.js";
 
 export default class Game {
-	word;
-	currentGuess = "";
-	listener;
-	currentIndex;
-	board;
+	#word;
+	#currentGuess = "";
+	#listener = null;
+	#currentIndex;
+	#board;
 
 	newGame() {
-		this.board = [].fill([null, null, null, null, null]);
-		this.word = WORDS[Math.floor(Math.random() * WORDS.length)];
-		this.currentIndex = 0;
+		this.#board = [].fill([null, null, null, null, null]);
+		this.#word = WORDS[Math.floor(Math.random() * WORDS.length)];
+		this.#currentIndex = 0;
 
 		for (let i = 0; i < NUM_TRIES; ++i) {
-			this.board.push(new Array(WORD_LENGTH).fill(""));
+			this.#board.push(new Array(WORD_LENGTH).fill(""));
 		}
 
-		this.listener.onBoardCreated(this.board);
-		console.log(this.word);
+		this.#listener?.onBoardCreated(this.#board);
 	}
 
 	key(key) {
-		if (this.currentGuess.length < 5) {
-			this.board[this.currentIndex][this.currentGuess.length] = key;
-			this.currentGuess += key;
+		if (this.#currentGuess.length < WORD_LENGTH) {
+			this.#board[this.#currentIndex][this.#currentGuess.length] = key;
+			this.#currentGuess += key;
 		}
 
-		this.listener.onBoardUpdated(this.board);
+		this.#listener?.onBoardUpdated(this.#board);
 	}
 
 	delete() {
-		this.board[this.currentIndex][this.currentGuess.length - 1] = null;
-		this.currentGuess = this.currentGuess.slice(
+		this.#board[this.#currentIndex][this.#currentGuess.length - 1] = null;
+		this.#currentGuess = this.#currentGuess.slice(
 			0,
-			this.currentGuess.length - 1
+			this.#currentGuess.length - 1
 		);
 
-		this.listener.onBoardUpdated(this.board);
+		this.#listener?.onBoardUpdated(this.#board);
 	}
 
 	checkValidWord() {
-		if (this.currentGuess.length < 5) {
+		if (this.#currentGuess.length < WORD_LENGTH) {
 			return "Not long enough!";
 		}
 
-		if (!WORDS.includes(this.currentGuess)) {
+		if (!WORDS.includes(this.#currentGuess)) {
 			return "Not in words list!";
 		}
 
@@ -53,85 +52,66 @@ export default class Game {
 	}
 
 	guess() {
-		// Create Map of letters
-		const letterMap = new Map();
-
-		for (let i = 0; i < this.word.length; ++i) {
-			if (letterMap.has(this.word[i])) {
-				letterMap.set(this.word[i], letterMap.get(this.word[i]) + 1);
-			} else {
-				letterMap.set(this.word[i], 1);
-			}
-		}
-
-		// Keep track of letters that exist in the word
+		let tmpWord = this.#word.split('');
 		let existingCells = [];
-
-		for (let i = 0; i < this.currentGuess.length; ++i) {
-			let letter = this.currentGuess[i];
-			if (letterMap.has(letter)) {
-				existingCells.push(i);
-
-				if (letterMap.get(letter) == 1) {
-					letterMap.delete(letter);
-				} else {
-					letterMap.set(letter, letterMap.get(letter) - 1);
-				}
-			}
-		}
-
-		// Keep track of correct letters (in the right place)
 		let correctCells = [];
+		let keys = tmpWord.map(key => {
+			return {
+				key: key,
+				className: 'checked'
+			}
+		});
 
-		for (let i = 0; i < this.word.length; ++i) {
-			if (this.currentGuess[i] === this.word[i]) {
+		for (let i = 0; i < this.#currentGuess.length; ++i) {
+			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
+
+			if (indexOfLetter > -1) {
+				tmpWord[indexOfLetter] = "#";
+				existingCells.push(i);
+			}
+
+			if (this.#word[i] === this.#currentGuess[i]) {
 				correctCells.push(i);
 			}
 		}
 
-		// Keep track of keys
-		let keys = [];
-
-		for (let i = 0; i < this.currentGuess.length; ++i) {
+		for (let index of existingCells) {
 			keys.push({
-				key: this.currentGuess[i],
-				className: "checked",
-			});
+				key: this.#currentGuess[index],
+				className: "in-word"
+			})
 		}
 
-		for (let i = 0; i < existingCells.length; ++i) {
-			keys.push({
-				key: this.currentGuess[existingCells[i]],
-				className: "in-word",
-			});
-		}
-
-		for (let i = 0; i < correctCells.length; ++i) {
-			if (!letterMap.has(this.currentGuess[correctCells[i]])) {
+		for (let index of correctCells) {
+			if (!tmpWord.includes(this.#currentGuess[index])) {
 				keys.push({
-					key: this.currentGuess[correctCells[i]],
-					className: "correct",
-				});
+					key: this.#currentGuess[index],
+					className: "correct"
+				})
 			}
 		}
 
-		this.listener.onGuessChecked(
-			this.currentIndex,
-			existingCells.map((v) => v + 1),
-			correctCells.map((v) => v + 1),
+		this.#listener?.onGuessChecked(
+			this.#currentIndex,
+			existingCells.map(v => v + 1),
+			correctCells.map(v => v + 1),
 			keys
 		);
 
-		++this.currentIndex;
+		++this.#currentIndex;
 
-		if (this.currentGuess === this.word) {
-			this.listener.onGameWin(this.currentIndex);
+		if (this.#currentGuess === this.#word) {
+			this.#listener?.onGameWin(this.#currentIndex);
 		}
 
-		this.currentGuess = "";
+		if (this.#currentIndex === 6) {
+			this.#listener?.onGameOver(this.#word);
+		}
+
+		this.#currentGuess = "";
 	}
 
 	addBoardListener(listener) {
-		this.listener = listener;
+		this.#listener = listener;
 	}
 }

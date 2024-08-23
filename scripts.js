@@ -6,7 +6,6 @@ export const WORD_LENGTH = 5;
 const driver = new GameController();
 
 document.addEventListener("keydown", (e) => {
-	// TODO: Check if key is alpha
 	if (e.key.length == 1 && e.code.startsWith("Key")) {
 		return driver.key(e.key);
 	}

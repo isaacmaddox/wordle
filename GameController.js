@@ -3,53 +3,53 @@ import { NUM_TRIES } from "./scripts.js";
 import ToastManager from "./ToastManager.js";
 
 export default class GameController {
-	game = new Game();
-	toastManager = new ToastManager();
-	boardElement;
-	isChecking = false;
-	isGameOver = false;
+	#game = new Game();
+	#toastManager = new ToastManager();
+	#boardElement;
+	#isChecking = false;
+	#isGameOver = false;
 
 	constructor() {
-		this.boardElement = document.getElementById("board");
+		this.#boardElement = document.getElementById("board");
 
 		for (let i = 0; i < NUM_TRIES; ++i) {
 			let row = document.createE;
 		}
 
-		this.game.addBoardListener(this);
-		this.game.newGame();
+		this.#game.addBoardListener(this);
+		this.#game.newGame();
 	}
 
 	key(key) {
-		if (!this.isChecking && !this.isGameOver) this.game.key(key);
+		if (!this.#isChecking && !this.#isGameOver) this.#game.key(key);
 	}
 
 	delete() {
-		if (!this.isChecking && !this.isGameOver) this.game.delete();
+		if (!this.#isChecking && !this.#isGameOver) this.#game.delete();
 	}
 
 	guess() {
-		if (this.isChecking || this.isGameOver) {
-			this.toastManager.toast("Please wait to guess");
+		if (this.#isChecking || this.#isGameOver) {
+			this.#toastManager.toast("Please wait to guess");
 			return false;
 		}
 
-		if (this.game.checkValidWord()) {
-			this.toastManager.toast(this.game.checkValidWord());
+		if (this.#game.checkValidWord()) {
+			this.#toastManager.toast(this.#game.checkValidWord());
 			return false;
 		}
 
-		this.isChecking = true;
-		this.game.guess();
+		this.#isChecking = true;
+		this.#game.guess();
 		setTimeout(() => {
-			this.isChecking = false;
+			this.#isChecking = false;
 		}, 900);
 
 		return true;
 	}
 
 	onBoardCreated(board) {
-		this.boardElement.querySelectorAll("*")?.forEach((child) => child.remove());
+		this.#boardElement.querySelectorAll("*")?.forEach((child) => child.remove());
 
 		for (let i = 0; i < board.length; ++i) {
 			const row = document.createElement("div");
@@ -62,7 +62,7 @@ export default class GameController {
 				row.appendChild(cell);
 			}
 
-			this.boardElement.appendChild(row);
+			this.#boardElement.appendChild(row);
 		}
 
 		document
@@ -118,6 +118,8 @@ export default class GameController {
 	}
 
 	onGameWin(attempts) {
+		this.#isGameOver = true;
+
 		setTimeout(() => {
 			document
 				.querySelector(`#board > :nth-child(${attempts})`)
@@ -128,8 +130,16 @@ export default class GameController {
 			let ans = confirm("You won! Do you want to play again?");
 
 			if (ans) {
-				this.game.newGame();
+				this.#game.newGame();
 			}
 		}, 1900);
+	}
+
+	onGameOver(word) {
+		this.#isGameOver = true;
+
+		let ans = confirm(`Game over! The word was ${word}. Do you want to play again?`);
+
+		if (ans) this.#game.newGame();
 	}
 }

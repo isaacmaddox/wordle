@@ -1,26 +1,27 @@
 export default class ToastManager {
-	toasts = [];
-	container;
+	#toasts = [];
+	#container;
 
 	constructor() {
-		this.container = document.getElementById("toast-container");
+		this.#container = document.getElementById("toast-container");
 	}
 
 	toast(message) {
 		let newToast = new Toast(message);
-		this.toasts = [newToast, ...this.toasts];
-		this.container.appendChild(newToast.getElement());
+		this.#toasts = [newToast, ...this.#toasts];
+		this.#container.appendChild(newToast.getElement());
 		this.updateToastTops();
 
 		setTimeout(() => {
-			newToast.remove();
-			this.toasts.splice(this.toasts.indexOf(newToast), 1);
+			newToast.remove().then(() => {
+				this.#toasts.splice(this.#toasts.indexOf(newToast), 1);
+			});
 		}, 2000);
 	}
 
 	updateToastTops() {
 		let top = 16;
-		let tmpToasts = [...this.toasts];
+		let tmpToasts = [...this.#toasts];
 
 		for (let i = 0; i < tmpToasts.length; ++i) {
 			tmpToasts[i].setTop(top);
@@ -30,29 +31,41 @@ export default class ToastManager {
 }
 
 class Toast {
-	element;
+	#element;
 
-	constructor(message, top) {
-		this.element = document.createElement("div");
-		this.element.classList = "toast";
-		this.element.textContent = message;
+	constructor(message) {
+		this.#element = document.createElement("div");
+		this.#element.classList = "toast";
+		this.#element.textContent = message;
 	}
 
 	setTop(top) {
 		setTimeout(() => {
-			this.element.style.setProperty("--_top", `${top}px`);
+			this.#element.style.setProperty("--_top", `${top}px`);
 		}, 1);
 	}
 
 	getElement() {
-		return this.element;
+		return this.#element;
 	}
 
 	getHeight() {
-		return this.element.getBoundingClientRect().height;
+		return this.#element.getBoundingClientRect().height;
 	}
 
 	remove() {
-		this.element.remove();
+		this.#element.classList.add('hide');
+
+		setTimeout(() => {
+			this.#element.remove();
+		}, 200);
+
+		return {
+			then(callback) {
+				setTimeout(() => {
+					callback()
+				}, 1000)
+			}
+		}
 	}
 }
