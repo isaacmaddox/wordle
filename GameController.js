@@ -93,17 +93,13 @@ export default class GameController {
 		});
 
 		for (let i = 0; i < inWordCells.length; ++i) {
-			let cell = document.querySelector(
-				`#board :nth-child(${row + 1}) :nth-child(${inWordCells[i]})`
-			);
+			let cell = cells[i];
 
 			cell.classList.add("checked", "in-word");
 		}
 
 		for (let i = 0; i < correctCells.length; ++i) {
-			let cell = document.querySelector(
-				`#board :nth-child(${row + 1}) :nth-child(${correctCells[i]})`
-			);
+			let cell = cells[i];
 
 			cell.classList.add("checked", "correct");
 		}
