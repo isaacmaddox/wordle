@@ -5,7 +5,6 @@ export default class GameController {
 	#game = new Game();
 	#toastManager = new ToastManager();
 	#boardElement;
-	#isChecking = false;
 	#isGameOver = false;
 
 	constructor() {
@@ -28,8 +27,7 @@ export default class GameController {
 	}
 
 	guess() {
-		if (this.#isChecking || this.#isGameOver) {
-			this.#toastManager.toast("Please wait to guess");
+		if (this.#isGameOver) {
 			return false;
 		}
 
@@ -93,13 +91,17 @@ export default class GameController {
 		});
 
 		for (let i = 0; i < inWordCells.length; ++i) {
-			let cell = cells[i];
+			let cell = document.querySelector(
+				`#board :nth-child(${row + 1}) :nth-child(${inWordCells[i]})`
+			);
 
 			cell.classList.add("checked", "in-word");
 		}
 
 		for (let i = 0; i < correctCells.length; ++i) {
-			let cell = cells[i];
+			let cell = document.querySelector(
+				`#board :nth-child(${row + 1}) :nth-child(${correctCells[i]})`
+			);
 
 			cell.classList.add("checked", "correct");
 		}

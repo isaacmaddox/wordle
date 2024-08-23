@@ -18,7 +18,6 @@ export default class Game {
 		}
 
 		this.#listener?.onBoardCreated(this.#board);
-		console.log(this.#word);
 	}
 
 	key(key) {
@@ -77,8 +76,12 @@ export default class Game {
 				tmpWord[indexOfLetter] = "#";
 				continue;
 			}
+		}
 
-			if (indexOfLetter > -1) {
+		for (let i = 0; i < this.#currentGuess.length; ++i) {
+			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
+
+			if (indexOfLetter > -1 && !correctCells.includes(indexOfLetter)) {
 				tmpWord[indexOfLetter] = "#";
 				existingCells.push(i);
 			}
@@ -111,8 +114,6 @@ export default class Game {
 			correctCells.map((v) => v + 1),
 			keys
 		);
-
-		console.log(keys);
 
 		++this.#currentIndex;
 
