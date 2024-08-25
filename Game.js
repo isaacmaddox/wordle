@@ -73,7 +73,7 @@ export default class Game {
 
 			if (this.#word[i] === this.#currentGuess[i]) {
 				correctCells.push(i);
-				tmpWord[indexOfLetter] = "#";
+				tmpWord[i] = "#";
 				continue;
 			}
 		}
