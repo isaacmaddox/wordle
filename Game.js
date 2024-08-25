@@ -11,7 +11,7 @@ export default class Game {
 	newGame() {
 		this.#board = [];
 		// this.#word = WORDS[Math.floor(Math.random() * WORDS.length)];
-  this.#word = "holly";
+		this.#word = "holly";
 		this.#currentIndex = 0;
 
 		for (let i = 0; i < NUM_TRIES; ++i) {
@@ -70,19 +70,16 @@ export default class Game {
 		});
 
 		for (let i = 0; i < this.#currentGuess.length; ++i) {
-			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
-
 			if (this.#word[i] === this.#currentGuess[i]) {
 				correctCells.push(i);
 				tmpWord[i] = "#";
-				continue;
 			}
 		}
 
 		for (let i = 0; i < this.#currentGuess.length; ++i) {
 			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
 
-			if (indexOfLetter > -1) {
+			if (indexOfLetter > -1 && !correctCells.includes(i)) {
 				tmpWord[indexOfLetter] = "#";
 				existingCells.push(i);
 			}
