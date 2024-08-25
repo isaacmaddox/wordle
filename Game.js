@@ -10,7 +10,8 @@ export default class Game {
 
 	newGame() {
 		this.#board = [];
-		this.#word = WORDS[Math.floor(Math.random() * WORDS.length)];
+		// this.#word = WORDS[Math.floor(Math.random() * WORDS.length)];
+  this.#word = "holly";
 		this.#currentIndex = 0;
 
 		for (let i = 0; i < NUM_TRIES; ++i) {
