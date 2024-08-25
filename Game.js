@@ -82,7 +82,7 @@ export default class Game {
 		for (let i = 0; i < this.#currentGuess.length; ++i) {
 			let indexOfLetter = tmpWord.indexOf(this.#currentGuess[i]);
 
-			if (indexOfLetter > -1 && !correctCells.includes(indexOfLetter)) {
+			if (indexOfLetter > -1) {
 				tmpWord[indexOfLetter] = "#";
 				existingCells.push(i);
 			}
