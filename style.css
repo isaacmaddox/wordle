@@ -52,6 +52,10 @@ body {
     display: grid;
     grid-template-rows: 1fr max-content;
     justify-content: center;
+
+    @media (width < 432px) {
+        grid-template-columns: 1fr;
+    }
 }
 
 dialog {
@@ -176,13 +180,7 @@ dialog {
         text-align: center;
         display: flex;
         justify-content: center;
-
         gap: var(--_key-gap);
-
-        &.three {
-            display: flex;
-            gap: var(--_key-gap);
-        }
 
         button {
             border: none;
@@ -215,6 +213,7 @@ dialog {
             &#enter,
             &#backspace {
                 flex-grow: 1;
+                width: auto;
 
                 & svg {
                     [fill] {
@@ -232,14 +231,27 @@ dialog {
                     background: var(--button-background-hover);
                 }
             }
+        }
+    }
 
-            @media (width <=420px) {
-                width: 32px;
+    @media (width < 432px) {
+        width: 100%;
+
+        .key-row {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+
+            &:nth-child(2) {
+                padding-inline: 5%;
+                grid-template-columns: repeat(9, 1fr);
             }
 
-            @media (width <=360px) {
-                width: 30px;
-                height: 48px;
+            &:nth-child(3) {
+                grid-template-columns: 1.5fr repeat(7, 1fr) 1.5fr;
+            }
+
+            button {
+                width: 100% !important;
             }
         }
     }
@@ -267,7 +279,7 @@ dialog {
             border: 2px solid var(--cell-border);
             aspect-ratio: 1;
             border-radius: .5rem;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             display: grid;
             place-items: center;
             text-transform: uppercase;
