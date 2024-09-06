@@ -29,8 +29,12 @@
     --dialog-color-text: light-dark(#333, #ddd);
 
     --dialog-primary-button-background: light-dark(#000, #fff);
+    --dialog-primary-button-hover-background: light-dark(#111, #eee);
     --dialog-primary-button-color: light-dark(#fff, #000);
     --dialog-secondary-button-color: light-dark(#000, #fff);
+    --dialog-secondary-button-hover-background: light-dark(#eee, #222);
+
+    --dialog-button-outline-color: light-dark(#000, #fff);
 }
 
 *,
@@ -142,19 +146,35 @@ dialog {
         margin-top: 1em;
 
         button {
-            padding: .5em 1.2em;
+            padding: .625em 1.2em;
             font-size: 1rem;
             border: none;
             background: transparent;
             cursor: pointer;
-            border-radius: .5em;
+            border-radius: .375em;
             font-weight: 600;
-
             color: var(--dialog-secondary-button-color);
+            transition: background 200ms ease;
+            outline: none;
+
+            &:focus-visible {
+                outline: 2px solid var(--dialog-button-outline-color);
+                outline-offset: 2px;
+            }
 
             &:nth-child(1) {
                 background: var(--dialog-primary-button-background);
                 color: var(--dialog-primary-button-color);
+            }
+
+            @media (pointer: fine) {
+                &:hover {
+                    background: var(--dialog-secondary-button-hover-background);
+                }
+
+                &:nth-child(1):hover {
+                    background: var(--dialog-primary-button-hover-background);
+                }
             }
         }
     }
